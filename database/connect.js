@@ -5,6 +5,7 @@ const establishConnection = ()=>{
     mongoose.connect(process.env.MONGOOSE_ADDRESS, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
+      useCreateIndex: true,
     });
     const db = mongoose.connection;
     db.once("open", function () {

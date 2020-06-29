@@ -9,7 +9,7 @@ authController.get(
     const { username, password } = req.body;
     const user = await User.findOne({ username });
     const correct = await user.checkPassword(password);
-    if (!correct) return next({ message: "wrong password" });
+    if (!correct) return next(JSON.stringify({ message: "wrong password" }));
     const token = user.getJwtToken();
     res.status(200).json({ success: true, token });
   })
@@ -17,9 +17,11 @@ authController.get(
 
 authController.get(
   "/signup",
-  // eslint-disable-next-line no-unused-vars
   asyncHandler(async (req, res, next) => {
     const { username, password, email, fullname } = req.body;
+    if (await User.count({username}) != 0 ||await User.count({email}) != 0) {
+      return next(JSON.stringify({ message: "Such accounts already exists" }));
+    }
     const newUser = await User.create({
       username,
       password,

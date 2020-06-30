@@ -1,15 +1,25 @@
+/* eslint-disable no-unused-vars */
 const express = require("express");
-const PostController = express.Router();
+const postController = express.Router();
 const { Post } = require("../database/model/index");
 const authenticate = require("../middleware/authenticate");
 const asyncHandler = require("express-async-handler");
 
+//get all posts
+postController.get(
+  "/",
+  authenticate,
+  // eslint-disable-next-line no-unused-vars
+  asyncHandler(async (req, res, next) => {
+    const result = await Post.find();
+    res.status(200).json({ success: true, posts: result });
+  })
+);
+
 // Create a post
-PostController.post("/", authenticate, (req, res) => {
-  const {email, username, title, body, photo} = req.body;
+postController.post("/", authenticate, (req, res) => {
+  const { title, body, photo } = req.body;
   const newUser = new Post({
-    email,
-    username,
     title,
     body,
     photo,
@@ -22,16 +32,28 @@ PostController.post("/", authenticate, (req, res) => {
   res.send("success!");
 });
 
-//get all posts
-PostController.get(
-  "/",
-  authenticate,
-  // eslint-disable-next-line no-unused-vars
+//SHOW info about the user profile /post/:title (GET)
+postController.get(
+  "/:title",
   asyncHandler(async (req, res, next) => {
-    const result = await Post.find();
-    res.status(200).json({ success: true, posts: result });
+    const title = req.params.title;
+    console.log(title);
+    const post = await Post.findOne({title}).lean().exec();
+    if (post == null)
+      return res.json({ success: false, message: "No such user found" });
+    res.status(200).json({ sucess: true, post });
   })
 );
 
+//UPDATE the user profile /post/:title (PUT)
+postController.put(
+  "/:title",
+  authenticate,
+  asyncHandler(async (req, res, next) => {
+    const title = req.params.title;
+    const post = await Post.findOneAndUpdate({ title }, req.body);
+    res.status(200).json({ sucess: true, post });
+  })
+);
 
-module.exports = PostController;
+module.exports = postController;

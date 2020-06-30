@@ -1,8 +1,9 @@
 const express = require("express");
 const PostController = express.Router();
 const { Post } = require("../database/model/index");
+const authenticate = require('../middleware/authenticate')
 
-PostController.get("/", (req, res) => {
+PostController.get("/", authenticate, (req, res) => {
   const newUser = new Post({
     email: "demo@gmail.com",
     username: "hello",

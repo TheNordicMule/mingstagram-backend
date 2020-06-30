@@ -5,7 +5,7 @@ const saltRounds = 10;
 const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
-const userSchema = new Schema({
+const UserSchema = new Schema({
   fullname: { type: String, trim: true },
   email: { type: String, required: true, trim: true, unqiue: true },
   username: { type: String, required: true, trim: true, unique: true },
@@ -15,18 +15,18 @@ const userSchema = new Schema({
   following: [{ type: ObjectId, ref: "User" }],
 });
 
-userSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) {
   const salt = await bcrypt.genSalt(saltRounds);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 })
 
-userSchema.methods.getJwtToken = () => {
+UserSchema.methods.getJwtToken = function () {
   return jwt.sign({ username: this.username }, process.env.JWT_SECRET);
 };
 
-userSchema.methods.checkPassword = async function (password)  {
+UserSchema.methods.checkPassword = async function (password)  {
   return await bcrypt.compare(password, this.password);
 };
 
-module.exports = userSchema;
+module.exports = UserSchema;

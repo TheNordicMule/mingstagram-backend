@@ -1,7 +1,7 @@
 const { Schema } = require("mongoose");
 const { ObjectId } = Schema.Types;
 
-const postSchema = new Schema({
+const PostSchema = new Schema({
   title: {
     type: String,
     required: true,
@@ -32,4 +32,4 @@ const postSchema = new Schema({
   },
 }, {timestamps: true});
 
-module.exports = postSchema;
+module.exports = PostSchema;

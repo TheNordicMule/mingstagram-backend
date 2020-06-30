@@ -15,7 +15,6 @@ const authenticate = asyncHandler(async (req, res, next) => {
   }
   const info = jwt.verify(token, process.env.JWT_SECRET);
   const user = await User.findOne({username: info.username});
-  console.log(user);
   if (!user) {
     return next(JSON.stringify({ message: "No user with that token found" }));
   }

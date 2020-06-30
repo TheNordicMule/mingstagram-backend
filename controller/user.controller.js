@@ -1,18 +1,30 @@
+/* eslint-disable no-unused-vars */
 const express = require("express");
 const userController = express.Router();
-const {User} = require('../database/model/index')
+const { User } = require("../database/model/index");
+const asyncHandler = require("express-async-handler");
 
-userController.get("/", (req, res) => {
-  const newUser = new User({
-    email: "demo@gmail.com",
-    username: "hello",
-  });
-  newUser.save((err) => {
-    if (err) {
-      console.log(err);
-    }
+//get route for all users
+userController.get(
+  "/",
+  asyncHandler(async (req, res, next) => {
+    console.log(req.params);
+    const users = await User.find().lean().exec();
+    res.status(200).json({ success: true, users });
   })
-  res.send('success!');
-});
+);
 
-module.exports = userController
+//get route for a specific user
+userController.get(
+  "/:username",
+  asyncHandler(async (req, res, next) => {
+    const user = await User.findOne({ username: req.params.username })
+      .lean()
+      .exec();
+    if (user == null)
+      return res.json({ success: false, message: "No such user found" });
+    res.status(200).json({ sucess: true, user });
+  })
+);
+
+module.exports = userController;

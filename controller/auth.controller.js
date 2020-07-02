@@ -18,7 +18,6 @@ authController.post(
         .json({ success: false, message: "Wrong password!" });
     const token = user.getJwtToken();
     user = await User.findOne({ username }).select("-password");
-    console.log(user);
     res.status(200).json({ success: true, token, user });
   })
 );
@@ -30,9 +29,16 @@ authController.post(
     if (
       (await User.count({ username })) != 0 ||
       (await User.count({ email })) != 0
-    ) {
-      return next(JSON.stringify({ message: "Such accounts already exists" }));
-    }
+    )
+      return res
+        .status(400)
+        .json({ success: false, message: "Such accounts already exists" });
+    if (password.length <= 6 || password.length >= 12)
+      return res.status(422).json({
+        success: false,
+        message:
+          "Password must be longer than 6 letters and shorter than 12 letters",
+      });
     const newUser = await User.create({
       username,
       password,
@@ -40,7 +46,8 @@ authController.post(
       fullname,
     });
     const token = newUser.getJwtToken();
-    res.status(200).json({ success: true, token });
+    const user = await User.findOne({ username }).select("-password");
+    res.status(200).json({ success: true, token, user });
   })
 );
 

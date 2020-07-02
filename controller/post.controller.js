@@ -37,7 +37,6 @@ postController.get(
   "/:title",
   asyncHandler(async (req, res, next) => {
     const title = req.params.title;
-    console.log(title);
     const post = await Post.findOne({title}).lean().exec();
     if (post == null)
       return res.json({ success: false, message: "No such user found" });

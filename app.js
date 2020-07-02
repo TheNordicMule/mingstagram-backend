@@ -1,6 +1,6 @@
 const express = require('express')
 const establishConnection = require('./database/connect')
-
+const cors = require('cors');
 const app = express();
 
 const {
@@ -11,6 +11,7 @@ const {
 
 establishConnection();
 
+app.use(cors());
 app.use(express.json());
 app.use("/auth", authController);
 app.use("/user", userController);

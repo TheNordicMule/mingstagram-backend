@@ -3,11 +3,13 @@ const authController = express.Router();
 const User = require("../database/model/user.model");
 const asyncHandler = require("express-async-handler");
 
-authController.get(
+authController.post(
   "/login",
   asyncHandler(async (req, res, next) => {
+    console.log(req.body)
     const { username, password } = req.body;
     const user = await User.findOne({ username });
+    if (!user) return res.status(400).json({success: false, message: "No user found"});
     const correct = await user.checkPassword(password);
     if (!correct) return next(JSON.stringify({ message: "wrong password" }));
     const token = user.getJwtToken();
@@ -15,7 +17,7 @@ authController.get(
   })
 );
 
-authController.get(
+authController.post(
   "/signup",
   asyncHandler(async (req, res, next) => {
     const { username, password, email, fullname } = req.body;

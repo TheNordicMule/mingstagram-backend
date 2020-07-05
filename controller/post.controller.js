@@ -11,7 +11,10 @@ postController.get(
   authenticate,
   // eslint-disable-next-line no-unused-vars
   asyncHandler(async (req, res, next) => {
-    const result = await Post.find();
+    const result = await Post.find()
+      .populate({path: 'postedBy', select: "photo username"})
+      .lean()
+      .exec();
     res.status(200).json({ success: true, posts: result });
   })
 );
@@ -37,7 +40,7 @@ postController.get(
   "/:title",
   asyncHandler(async (req, res, next) => {
     const title = req.params.title;
-    const post = await Post.findOne({title}).lean().exec();
+    const post = await Post.findOne({ title }).lean().exec();
     if (post == null)
       return res.json({ success: false, message: "No such user found" });
     res.status(200).json({ sucess: true, post });

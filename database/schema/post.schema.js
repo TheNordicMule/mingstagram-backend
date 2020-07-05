@@ -2,10 +2,6 @@ const { Schema } = require("mongoose");
 const { ObjectId } = Schema.Types;
 
 const PostSchema = new Schema({
-  title: {
-    type: String,
-    required: true,
-  },
   body: {
     type: String,
     required: true,
@@ -29,6 +25,7 @@ const PostSchema = new Schema({
   postedBy: {
     type: ObjectId,
     ref: "User",
+    required: true,
   },
 }, {timestamps: true});
 

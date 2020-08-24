@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 const express = require("express");
 const postController = express.Router();
-const { Post } = require("../database/model/index");
+const { Post, Comment } = require("../database/model/index");
 const authenticate = require("../middleware/authenticate");
 const asyncHandler = require("express-async-handler");
 
@@ -12,7 +12,10 @@ postController.get(
   // eslint-disable-next-line no-unused-vars
   asyncHandler(async (req, res, next) => {
     const result = await Post.find()
-      .populate({path: 'postedBy', select: "photo username"})
+      .populate({ path: "postedBy", select: "photo username" })
+      .populate({
+        path: "comments",
+      })
       .lean()
       .exec();
     res.status(200).json({ success: true, posts: result });
@@ -21,9 +24,11 @@ postController.get(
 
 // Create a post
 postController.post("/", authenticate, (req, res) => {
-  const { title, body, photo } = req.body;
+  const { body, photo } = req.body;
+  const postedBy = req.user;
+  console.log(postedBy);
   const newUser = new Post({
-    title,
+    postedBy,
     body,
     photo,
   });
@@ -57,5 +62,40 @@ postController.put(
     res.status(200).json({ sucess: true, post });
   })
 );
+
+// Post a new comment /:id/comment(POST)
+postController.post(
+  "/:id/comment",
+  authenticate,
+  asyncHandler(async (req, res, next) => {
+    const post = await Post.findById(req.params.id);
+    let comment = await Comment.create({
+      user: req.user.id,
+      post: req.params.id,
+      text: req.body.text,
+    });
+    post.comments.push(comment._id);
+    // console.log(post);
+    // post.comments = comment;
+    await post.save();
+
+    comment = await comment
+      .populate({ path: "user", select: "photo username fullname" })
+      .execPopulate();
+
+    res.status(200).json({ success: true, data: comment });
+  })
+);
+
+// // get all comments /:id/comment(GET)
+// postController.get(
+//   "/:id/comment",
+//   authenticate,
+//   asyncHandler(async (req, res, next) => {
+//     const post = await Post.findById(req.params.id);
+//     console.log(post);
+//     res.status(200).json({ success: true, data: comments });
+//   })
+// );
 
 module.exports = postController;

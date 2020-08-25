@@ -18,8 +18,8 @@ postController.get(
         select: "text",
         populate: {
           path: "user",
-          select: "username"
-        }
+          select: "username",
+        },
       })
       .lean()
       .exec();
@@ -89,6 +89,29 @@ postController.post(
       .execPopulate();
 
     res.status(200).json({ success: true, data: comment });
+  })
+);
+
+// Like a post  /:id/like(POST)
+postController.post(
+  "/:id/like",
+  authenticate,
+  asyncHandler(async (req, res, next) => {
+    const post = await Post.findById(req.params.id);
+    if (!post) {
+      return next({ statusCode: 404, message: "no post found" });
+    }
+    if (post.likes.includes(req.user.id)) {
+      const index = post.likes.indexOf(req.user.id);
+      post.likes.splice(index, 1);
+      post.likesCount -= 1;
+      await post.save();
+    } else {
+      post.likes.push(req.user.id);
+      post.likesCount += 1;
+      await post.save();
+    }
+    res.status(200).json({ success: true, data: {} });
   })
 );
 

@@ -17,6 +17,10 @@ const PostSchema = new Schema(
         ref: "User",
       },
     ],
+    likesCount: {
+      type: Number,
+      default: 0,
+    },
     comments: [{ type: ObjectId, ref: "Comment" }],
     // comments: { type: ObjectId, ref: "Comment" },
     postedBy: {

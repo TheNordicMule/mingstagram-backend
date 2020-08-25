@@ -15,6 +15,11 @@ postController.get(
       .populate({ path: "postedBy", select: "photo username" })
       .populate({
         path: "comments",
+        select: "text",
+        populate: {
+          path: "user",
+          select: "username"
+        }
       })
       .lean()
       .exec();

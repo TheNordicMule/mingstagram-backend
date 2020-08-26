@@ -23,6 +23,16 @@ postController.get(
       })
       .lean()
       .exec();
+    const user = req.user.id;
+    result.forEach((post) => {
+      let { likes } = post;
+      likes = likes.map((like) => like.toString());
+      if (likes.includes(user)) {
+        post.isLikedByMe = true;
+      } else {
+        post.isLikedByMe = false;
+      }
+    });
     res.status(200).json({ success: true, posts: result });
   })
 );

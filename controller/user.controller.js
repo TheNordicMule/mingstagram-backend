@@ -32,15 +32,8 @@ userController.put(
   "/:username",
   authenticate,
   asyncHandler(async (req, res, next) => {
-    const {
-      username,
-      password,
-      photo,
-      followers,
-      following,
-      fullname,
-      email,
-    } = req.body;
+    const { username } = req.user;
+    const { password, photo, followers, following, fullname, email } = req.body;
     const doc = await User.findOneAndUpdate({ username }, req.body);
     res.status(200).json({ sucess: true });
   })

@@ -2,6 +2,7 @@ const express = require('express')
 const establishConnection = require('./database/connect')
 const cors = require('cors');
 const app = express();
+const PORT = process.env.PORT || 8000;
 
 const {
   userController,
@@ -17,6 +18,6 @@ app.use("/auth", authController);
 app.use("/user", userController);
 app.use("/post", postController);
 
-app.listen(8000, ()=> {
+app.listen(PORT, ()=> {
     console.log(`server started on 8000`);
 })

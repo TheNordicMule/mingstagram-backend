@@ -52,7 +52,7 @@ postController.post("/", authenticate, (req, res) => {
       console.log(err);
     }
   });
-  res.send("success!");
+  res.status(200).json({ success: true });
 });
 
 //SHOW info about the user profile /post/:title (GET)

@@ -8,6 +8,7 @@ const authenticate = require("../middleware/authenticate");
 //get route for all users /user (GET)
 userController.get(
   "/",
+  authenticate,
   asyncHandler(async (req, res, next) => {
     const users = await User.find().lean().exec();
     res.status(200).json({ success: true, users });
@@ -17,6 +18,7 @@ userController.get(
 //SHOW info about the user profile /user/:id (GET)
 userController.get(
   "/:username",
+  authenticate,
   asyncHandler(async (req, res, next) => {
     const user = await User.findOne({ username: req.params.username })
       .lean()
